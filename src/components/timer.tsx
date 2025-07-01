@@ -3,42 +3,45 @@ import { Button } from '@/components/ui/button';
 
 interface TimerProps {
     initialSeconds: number;
+    onTimerEnd?: () => void;
 }
+type TimerState = 'started' | 'paused' | 'ended';
 
-export default function Timer({ initialSeconds }: TimerProps) {
+export default function Timer({ initialSeconds, onTimerEnd }: TimerProps) {
     const [seconds, setSeconds] = useState(initialSeconds);
-    const [started, setStarted] = useState(false);
+    const [timerState, setTimerState] = useState<TimerState>('paused');
     let timer = useRef<NodeJS.Timeout | null>(null);
 
-    function startTimer() {
-        setStarted(true);
-        timer.current = setInterval(() => {
-            setSeconds(prev => {
-                if (prev <= 1) {
-                    stopTimer();
-                    return initialSeconds;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-    }
-
-    function stopTimer() {
-        clearInterval(timer.current!);
-        timer.current = null;
-        setStarted(false);
+    function cleanupTimer() {
+        if (timer.current) {
+            clearInterval(timer.current);
+            timer.current = null;
+        }
     }
 
     function handleToggle() {
-        if (timer.current) stopTimer();
-        else startTimer();
+        setTimerState(prev => (prev === 'paused' ? 'started' : 'paused'));
     }
 
     useEffect(() => {
+        if (timerState === 'ended') onTimerEnd?.();
+        if (timerState === 'started') {
+            timer.current = setInterval(() => {
+                setSeconds(prev => {
+                    if (prev <= 1) {
+                        cleanupTimer();
+                        setTimerState('ended');
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+
         return () => {
-            if (timer.current) stopTimer();
+            if (timer.current || timerState === 'started') cleanupTimer();
         };
-    }, []);
+    }, [timerState]);
 
     const formattedTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
@@ -52,7 +55,7 @@ export default function Timer({ initialSeconds }: TimerProps) {
                 {formattedTime(seconds)}
             </h1>
             <Button onClick={handleToggle}>
-                {started ? 'متوقف شو' : 'شروع کن'}
+                {timerState === 'started' ? 'نگهش دار' : 'شروعش کن'}
             </Button>
         </div>
     );

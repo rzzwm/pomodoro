@@ -71,11 +71,22 @@
     --ring: oklch(0.556 0 0);
 }
 
+@font-face {
+    font-family: 'vazirmatn';
+    src:
+        url('fonts/vazirmatn.woff2') format('woff2 supports variations'),
+        url('fonts/vazirmatn.woff2') format('woff2-variations');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 @layer base {
     * {
         @apply border-border outline-ring/50;
     }
     body {
         @apply bg-background text-foreground;
+        font-family: 'vazirmatn', sans-serif;
     }
 }

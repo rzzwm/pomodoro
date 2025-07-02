@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useLocalStorage } from '@/lib/hooks';
 import Timer from '@/components/timer';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 type TimerMode = 'POMODORO' | 'SHORT_BREAK' | 'LONG_BREAK';
 
 const defaultPrefs = {
-    stageSeconds: [5, 5, 15],
+    stageSeconds: [25 * 60, 5 * 60, 15 * 60],
 };
 
 function App() {
@@ -42,6 +43,25 @@ function App() {
                     initialSeconds={currentConfig.seconds}
                     onTimerEnd={handleTimerEnd}
                 />
+                <ToggleGroup
+                    size="lg"
+                    type="single"
+                    variant="outline"
+                    value={timerMode}
+                    onValueChange={val => {
+                        setTimerMode(val as TimerMode);
+                    }}
+                >
+                    {Object.keys(modeConfigs).map(mode => (
+                        <ToggleGroupItem
+                            key={mode}
+                            value={mode}
+                            className="px-4"
+                        >
+                            {modeConfigs[mode as TimerMode].label}
+                        </ToggleGroupItem>
+                    ))}
+                </ToggleGroup>
             </div>
         </div>
     );

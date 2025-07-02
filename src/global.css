@@ -88,5 +88,12 @@
     body {
         @apply bg-background text-foreground;
         font-family: 'vazirmatn', sans-serif;
+        font-feature-settings: 'ss01';
+    }
+}
+
+@layer components {
+    .font-feature-none {
+        font-feature-settings: initial;
     }
 }

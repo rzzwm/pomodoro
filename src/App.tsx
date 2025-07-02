@@ -1,5 +1,70 @@
+import { useState } from 'react';
+import { useLocalStorage } from '@/lib/hooks';
+import Timer from '@/components/timer';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+
+type TimerMode = 'POMODORO' | 'SHORT_BREAK' | 'LONG_BREAK';
+
+const defaultPrefs = {
+    stageSeconds: [25 * 60, 5 * 60, 15 * 60],
+};
+
 function App() {
-    return <h1>سلام دنیا</h1>;
+    const [timerMode, setTimerMode] = useState<TimerMode>('POMODORO');
+    const [prefs] = useLocalStorage('prefs', defaultPrefs);
+    const [_, setPomoCount] = useLocalStorage('pomo-count', 0);
+
+    function handleTimerEnd() {
+        if (timerMode === 'POMODORO') {
+            setPomoCount(prev => {
+                const next = prev + 1;
+                next % 4 === 0
+                    ? setTimerMode('LONG_BREAK')
+                    : setTimerMode('SHORT_BREAK');
+                return next;
+            });
+        } else setTimerMode('POMODORO');
+    }
+
+    const modeConfigs = {
+        POMODORO: { seconds: prefs.stageSeconds[0], label: 'پومودورو!' },
+        SHORT_BREAK: { seconds: prefs.stageSeconds[1], label: 'استراحت کوتاه' },
+        LONG_BREAK: { seconds: prefs.stageSeconds[2], label: 'استراحت طولانی' },
+    };
+    const currentConfig = modeConfigs[timerMode];
+
+    return (
+        <div className="min-h-screen container mx-auto px-4 flex items-center justify-center">
+            <div>
+                <h1 className="text-2xl font-bold mb-4">تایمر پومودورو</h1>
+                <p>{currentConfig.label}</p>
+                <Timer
+                    key={timerMode}
+                    initialSeconds={currentConfig.seconds}
+                    onTimerEnd={handleTimerEnd}
+                />
+                <ToggleGroup
+                    size="lg"
+                    type="single"
+                    variant="outline"
+                    value={timerMode}
+                    onValueChange={val => {
+                        setTimerMode(val as TimerMode);
+                    }}
+                >
+                    {Object.keys(modeConfigs).map(mode => (
+                        <ToggleGroupItem
+                            key={mode}
+                            value={mode}
+                            className="px-4"
+                        >
+                            {modeConfigs[mode as TimerMode].label}
+                        </ToggleGroupItem>
+                    ))}
+                </ToggleGroup>
+            </div>
+        </div>
+    );
 }
 
 export default App;

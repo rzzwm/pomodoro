@@ -1,24 +1,34 @@
+import { useState } from 'react';
+import { useLocalStorage } from '@/lib/hooks';
 import Timer from '@/components/timer';
-import { useRef, useState } from 'react';
 
 type TimerMode = 'POMODORO' | 'SHORT_BREAK' | 'LONG_BREAK';
+
+const defaultPrefs = {
+    stageSeconds: [5, 5, 15],
+};
+
 function App() {
     const [timerMode, setTimerMode] = useState<TimerMode>('POMODORO');
-    const pomos = useRef(0);
+    const [prefs] = useLocalStorage('prefs', defaultPrefs);
+    const [_, setPomoCount] = useLocalStorage('pomo-count', 0);
 
     function handleTimerEnd() {
         if (timerMode === 'POMODORO') {
-            pomos.current += 1;
-            pomos.current % 4 === 0
-                ? setTimerMode('LONG_BREAK')
-                : setTimerMode('SHORT_BREAK');
+            setPomoCount(prev => {
+                const next = prev + 1;
+                next % 4 === 0
+                    ? setTimerMode('LONG_BREAK')
+                    : setTimerMode('SHORT_BREAK');
+                return next;
+            });
         } else setTimerMode('POMODORO');
     }
 
     const modeConfigs = {
-        POMODORO: { seconds: 25, label: 'پومودورو!' },
-        SHORT_BREAK: { seconds: 5, label: 'استراحت کوتاه' },
-        LONG_BREAK: { seconds: 15, label: 'استراحت طولانی' },
+        POMODORO: { seconds: prefs.stageSeconds[0], label: 'پومودورو!' },
+        SHORT_BREAK: { seconds: prefs.stageSeconds[1], label: 'استراحت کوتاه' },
+        LONG_BREAK: { seconds: prefs.stageSeconds[2], label: 'استراحت طولانی' },
     };
     const currentConfig = modeConfigs[timerMode];
 

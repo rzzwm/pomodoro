@@ -89,4 +89,11 @@
         @apply bg-background text-foreground;
         font-family: 'vazirmatn', sans-serif;
     }
+    progress::-webkit-progress-value {
+        background-color: #4caf50;
+        border-radius: 3px;
+        transition:
+            width 0.2s ease-in-out,
+            background-color 0.2s ease-in-out;
+    }
 }

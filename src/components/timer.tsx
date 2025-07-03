@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { usePrefs } from '@/components/prefs-provider';
 type Options = 'option1' | 'option2' | 'option3';
 
 export default function Timer() {
@@ -70,11 +71,11 @@ function RadioButtonGroup({
 }
 
 function TimerProgress({ mode }: { mode: Options }) {
-    // TODO: KEEP THEM IN SYNC WITH LOCAL STORAGE
+    const { prefs } = usePrefs();
     const MODE_PREFS = {
-        option1: { totalSeconds: 10 * 60, label: 'حالت اول' },
-        option2: { totalSeconds: 50, label: 'حالت دوم' },
-        option3: { totalSeconds: 20, label: 'حالت سوم' },
+        option1: { totalSeconds: prefs.stageSeconds[0], label: 'حالت اول' },
+        option2: { totalSeconds: prefs.stageSeconds[1], label: 'حالت دوم' },
+        option3: { totalSeconds: prefs.stageSeconds[2], label: 'حالت سوم' },
     };
     const currentMode = MODE_PREFS[mode];
 

@@ -1,16 +1,7 @@
-import { useLocalStorage } from '@/lib/hooks';
-
-interface Prefs {
-    stageSeconds: number[];
-}
-
-const DEFAULT_PREFS: Prefs = {
-    stageSeconds: [25 * 60, 5 * 60, 15 * 60],
-};
+import { usePrefs } from '@/components/prefs-provider';
 
 export default function Settings() {
-    const [prefs, setPrefs] = useLocalStorage<Prefs>('prefs', DEFAULT_PREFS);
-
+    const { prefs, setPrefs } = usePrefs();
     return (
         <div>
             <h2>تنظیمات</h2>

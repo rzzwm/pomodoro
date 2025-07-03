@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTimer } from '@/lib/hooks';
 import { usePrefs } from '@/components/prefs-provider';
 type Options = 'option1' | 'option2' | 'option3';
 
@@ -78,19 +79,17 @@ function TimerProgress({ mode }: { mode: Options }) {
         option3: { totalSeconds: prefs.stageSeconds[2], label: 'حالت سوم' },
     };
     const currentMode = MODE_PREFS[mode];
-
-    const [timeLeft, setTimeLeft] = useState(0);
-    useEffect(() => {
-        setTimeLeft(currentMode.totalSeconds);
-    }, [currentMode.totalSeconds]);
+    const { timeLeft, timerState, pause, reset, start } = useTimer({
+        totalSeconds: currentMode.totalSeconds,
+    });
 
     useEffect(() => {
-        if (timeLeft <= 0) return;
-        const interval = setInterval(() => {
-            setTimeLeft(prev => Math.max(prev - 1, 0));
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [timeLeft]);
+        reset();
+    }, [mode, currentMode.totalSeconds]);
+
+    function toggleTimer() {
+        timerState === 'STARTED' ? pause() : start();
+    }
 
     return (
         <div>
@@ -102,6 +101,12 @@ function TimerProgress({ mode }: { mode: Options }) {
                 max={currentMode.totalSeconds}
             ></progress>
             <span>{timeLeft}</span>
+            <div>
+                <button onClick={toggleTimer}>
+                    {timerState === 'STARTED' ? 'نگهش دار' : 'شروع کن'}
+                </button>
+                <button onClick={() => reset()}>از اول</button>
+            </div>
         </div>
     );
 }

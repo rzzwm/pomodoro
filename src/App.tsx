@@ -5,7 +5,6 @@ import Settings from '@/components/settings';
 function App() {
     return (
         <>
-            <h1>سلام دنیا</h1>
             <PrefsProvider>
                 <Timer />
                 <Settings />

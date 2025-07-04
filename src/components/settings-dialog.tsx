@@ -61,6 +61,8 @@ export function SettingsDialog() {
                                         min="1"
                                         value={stagePrefs.minutes / 60}
                                         onChange={e => {
+                                            if (Number(e.target.value) < 1)
+                                                return;
                                             setPrefs(prefs => {
                                                 const newPrefs = { ...prefs };
                                                 newPrefs.stageSeconds[

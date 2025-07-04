@@ -4,10 +4,12 @@ import { type Stages } from '@/lib/types';
 import { useTimer } from '@/lib/hooks';
 import { usePrefs } from '@/components/prefs-provider';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
+import notification from '@/assets/notifiacation.mp3';
 
 export default function Timer() {
     const [stage, setStage] = useState<Stages>('POMO');
+    const audioRef = useRef<HTMLAudioElement>(null);
     const handleChange = (value: Stages) => {
         setStage(value);
     };
@@ -18,6 +20,7 @@ export default function Timer() {
             else setStage('BRAKE');
             localStorage.setItem('pomo-c', (pomoCount + 1).toString());
         } else setStage('POMO');
+        audioRef.current?.play();
     };
 
     return (
@@ -25,6 +28,7 @@ export default function Timer() {
             <TimerProgress stage={stage} onTimerEnd={handleTimerEnd} />
             <StagePicker value={stage} onChange={handleChange} />
             <PomoStatus />
+            <audio ref={audioRef} src={notification} className="hidden"></audio>
         </div>
     );
 }

@@ -24,6 +24,7 @@ export default function Timer() {
         <div className="flex flex-col items-center justify-center gap-6">
             <TimerProgress stage={stage} onTimerEnd={handleTimerEnd} />
             <StagePicker value={stage} onChange={handleChange} />
+            <PomoStatus />
         </div>
     );
 }
@@ -103,20 +104,19 @@ function TimerProgress({
             />
             <div className="flex justify-center gap-4">
                 <Button
-                    variant="outline"
                     onClick={toggleTimer}
-                    className="size-12 rounded-full"
+                    className="size-12 rounded-full *:transition-transform active:scale-95"
                 >
-                    {timerState === 'STARTED' ? (
-                        <Pause className="size-6" />
-                    ) : (
-                        <Play className="size-6" />
-                    )}
+                    <Pause
+                        className={`size-6 ${timerState === 'STARTED' ? 'scale-100' : 'scale-0 rotate-90'}`}
+                    />
+                    <Play
+                        className={`size-6 absolute ${timerState !== 'STARTED' ? 'scale-100' : 'scale-0 -rotate-90'}`}
+                    />
                 </Button>
                 <Button
-                    variant="outline"
                     onClick={() => reset()}
-                    className="size-12 rounded-full active:*:-rotate-90"
+                    className="size-12 rounded-full active:*:-rotate-90 active:scale-95"
                 >
                     <RotateCcw className="size-6 transition-transform" />
                 </Button>
@@ -175,5 +175,14 @@ function CircularProgressBar({
                 {text}
             </text>
         </svg>
+    );
+}
+
+function PomoStatus() {
+    const pomoCount = localStorage.getItem('pomo-c') ?? '0';
+    return (
+        <p className="text-sm text-muted-foreground">
+            تا الان <strong>{pomoCount}</strong> تا پومودورو گذروندی!
+        </p>
     );
 }

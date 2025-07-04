@@ -11,9 +11,18 @@ export default function Timer() {
     const handleChange = (value: Stages) => {
         setStage(value);
     };
+    const handleTimerEnd = () => {
+        if (stage === 'POMO') {
+            const pomoCount = Number(localStorage.getItem('pomo-c')) ?? 0;
+            if ((pomoCount + 1) % 4 === 0) setStage('L_BRAKE');
+            else setStage('BRAKE');
+            localStorage.setItem('pomo-c', (pomoCount + 1).toString());
+        } else setStage('POMO');
+    };
+
     return (
         <div className="flex flex-col items-center justify-center gap-6">
-            <TimerProgress stage={stage} />
+            <TimerProgress stage={stage} onTimerEnd={handleTimerEnd} />
             <StagePicker value={stage} onChange={handleChange} />
         </div>
     );
@@ -53,7 +62,13 @@ function StagePicker({
     );
 }
 
-function TimerProgress({ stage }: { stage: Stages }) {
+function TimerProgress({
+    stage,
+    onTimerEnd,
+}: {
+    stage: Stages;
+    onTimerEnd: () => void;
+}) {
     const { prefs } = usePrefs();
     const STAGE_PREFS: Record<Stages, { totalSeconds: number }> = {
         POMO: { totalSeconds: prefs.stageSeconds.POMO.minutes },
@@ -67,6 +82,7 @@ function TimerProgress({ stage }: { stage: Stages }) {
     const currentStage = STAGE_PREFS[stage];
     const { timeLeft, timerState, pause, reset, start } = useTimer({
         totalSeconds: currentStage.totalSeconds,
+        onTimerEnd,
     });
     const timeLeftPercent = (timeLeft / currentStage.totalSeconds) * 100;
     const formattedTimeLeft = `${String(Math.floor(timeLeft / 60)).padStart(2, '0')} : ${String(timeLeft % 60).padStart(2, '0')}`;

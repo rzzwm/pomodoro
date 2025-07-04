@@ -1,8 +1,9 @@
+import { type Stages } from '@/lib/types';
 import { createContext, useContext } from 'react';
 import { useLocalStorage } from '@/lib/hooks';
 
 interface Prefs {
-    stageSeconds: number[];
+    stageSeconds: Record<Stages, { minutes: number }>;
 }
 interface ContextValue {
     prefs: Prefs;
@@ -10,7 +11,11 @@ interface ContextValue {
 }
 
 const DEFAULT_PREFS: Prefs = {
-    stageSeconds: [25 * 60, 5 * 60, 15 * 60],
+    stageSeconds: {
+        POMO: { minutes: 25 * 60 },
+        BRAKE: { minutes: 5 * 60 },
+        L_BRAKE: { minutes: 15 * 60 },
+    },
 };
 
 const PrefsContext = createContext<ContextValue>({

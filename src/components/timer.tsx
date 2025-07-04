@@ -1,17 +1,17 @@
+import { type Stages } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { useTimer } from '@/lib/hooks';
 import { usePrefs } from '@/components/prefs-provider';
-type Options = 'option1' | 'option2' | 'option3';
 
 export default function Timer() {
-    const [timerMode, setTimerMode] = useState<Options>('option1');
+    const [stage, setStage] = useState<Stages>('POMO');
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTimerMode(event.target.value as Options);
+        setStage(event.target.value as Stages);
     };
     return (
         <div className="flex gap-4">
-            <RadioButtonGroup value={timerMode} onChange={handleChange} />
-            <TimerProgress mode={timerMode} />
+            <RadioButtonGroup value={stage} onChange={handleChange} />
+            <TimerProgress stage={stage} />
         </div>
     );
 }
@@ -71,21 +71,25 @@ function RadioButtonGroup({
     );
 }
 
-function TimerProgress({ mode }: { mode: Options }) {
+function TimerProgress({ stage }: { stage: Stages }) {
     const { prefs } = usePrefs();
-    const MODE_PREFS = {
-        option1: { totalSeconds: prefs.stageSeconds[0], label: 'حالت اول' },
-        option2: { totalSeconds: prefs.stageSeconds[1], label: 'حالت دوم' },
-        option3: { totalSeconds: prefs.stageSeconds[2], label: 'حالت سوم' },
+    const STAGE_PREFS: Record<Stages, { totalSeconds: number }> = {
+        POMO: { totalSeconds: prefs.stageSeconds.POMO.minutes },
+        BRAKE: {
+            totalSeconds: prefs.stageSeconds.BRAKE.minutes,
+        },
+        L_BRAKE: {
+            totalSeconds: prefs.stageSeconds.L_BRAKE.minutes,
+        },
     };
-    const currentMode = MODE_PREFS[mode];
+    const currentStage = STAGE_PREFS[stage];
     const { timeLeft, timerState, pause, reset, start } = useTimer({
-        totalSeconds: currentMode.totalSeconds,
+        totalSeconds: currentStage.totalSeconds,
     });
 
     useEffect(() => {
         reset();
-    }, [mode, currentMode.totalSeconds]);
+    }, [stage, currentStage.totalSeconds]);
 
     function toggleTimer() {
         timerState === 'STARTED' ? pause() : start();
@@ -93,12 +97,9 @@ function TimerProgress({ mode }: { mode: Options }) {
 
     return (
         <div>
-            <p>
-                <strong>الان رو این حالتیم: </strong> {currentMode.label}
-            </p>
             <progress
                 value={timeLeft}
-                max={currentMode.totalSeconds}
+                max={currentStage.totalSeconds}
             ></progress>
             <span>{timeLeft}</span>
             <div>

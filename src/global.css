@@ -74,8 +74,8 @@
 @font-face {
     font-family: 'vazirmatn';
     src:
-        url('fonts/vazirmatn.woff2') format('woff2 supports variations'),
-        url('fonts/vazirmatn.woff2') format('woff2-variations');
+        url('/fonts/vazirmatn.woff2') format('woff2 supports variations'),
+        url('/fonts/vazirmatn.woff2') format('woff2-variations');
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
